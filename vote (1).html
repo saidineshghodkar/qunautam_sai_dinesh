@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum-Blockchain Secure Voting System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            width: 100%;
+            min-height: 90vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            background: #f8f9fa;
+            padding: 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 20px 40px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .nav-btn:hover {
+            background: #e9ecef;
+            color: #2196F3;
+        }
+
+        .nav-btn.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+            background: white;
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .admin-tab {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-tab:hover {
+            background: #f8f9fa;
+            color: #2196F3;
+        }
+
+        .admin-tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #ff6b6b);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #66bb6a);
+        }
+
+        .btn-large {
+            padding: 20px 40px;
+            font-size: 18px;
+            margin: 10px;
+        }
+
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 600px;
+        }
+
+        .symbol-option {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .symbol-option:hover {
+            border-color: #2196F3;
+            transform: scale(1.1);
+        }
+
+        .symbol-option.selected {
+            border-color: #2196F3;
+            background: #f0f8ff;
+            transform: scale(1.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+
+        .voting-interface {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .party-card {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .party-card:hover {
+            border-color: #2196F3;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .party-card.selected {
+            border-color: #2196F3;
+            background: #f0f8ff;
+        }
+
+        .party-symbol {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .party-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .biometric-area {
+            border: 3px dashed #ccc;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .biometric-area:hover {
+            border-color: #2196F3;
+            background: #f0f8ff;
+        }
+
+        .biometric-area.active {
+            border-color: #4CAF50;
+            background: #f1f8e9;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success { background: #4CAF50; }
+        .status-error { background: #f44336; }
+        .status-warning { background: #ff9800; }
+
+        .officer-control-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #2196F3;
+        }
+
+        .ballot-header {
+            background: linear-gradient(135deg, #4CAF50, #66bb6a);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .nav-btn {
+                border-bottom: 1px solid #dee2e6;
+                border-right: none;
+            }
+            
+            .voting-interface {
+                grid-template-columns: 1fr;
+            }
+
+            .symbol-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Quantum-Blockchain Voting System</h1>
+            <p>Secure • Transparent • Tamper-Proof • Quantum-Encrypted</p>
+        </div>
+
+        <div class="navigation">
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showSection('admin')">🔧 Admin Panel</button>
+                <button class="nav-btn" onclick="showSection('officer')">👮 Officer Panel</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Admin Panel Section -->
+            <div id="admin" class="section active">
+                <h2>🔧 Administration Center</h2>
+                
+                <div id="admin-login" class="form-section">
+                    <h3>Admin Authentication</h3>
+                    <div class="form-group">
+                        <label for="admin-password">Admin Password</label>
+                        <input type="password" id="admin-password" placeholder="Enter admin password">
+                    </div>
+                    <button class="btn btn-large" onclick="adminLogin()">🔐 Login as Admin</button>
+                </div>
+
+                <div id="admin-controls" class="hidden">
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" onclick="showAdminTab('register-officer')">Register Officer</button>
+                        <button class="admin-tab" onclick="showAdminTab('register-party')">Register Party</button>
+                        <button class="admin-tab" onclick="showAdminTab('dashboard')">Dashboard</button>
+                        <button class="admin-tab" onclick="showAdminTab('results')">Election Results</button>
+                        <button class="admin-tab" onclick="showAdminTab('system')">System Controls</button>
+                    </div>
+
+                    <!-- Register Officer Tab -->
+                    <div id="register-officer" class="admin-content active">
+                        <h3>👮 Register Polling Officer</h3>
+                        <div class="form-group">
+                            <label for="officer-name">Officer Name</label>
+                            <input type="text" id="officer-name" placeholder="Enter officer full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="officer-number">Officer Number</label>
+                            <input type="text" id="officer-number" placeholder="Enter unique officer number">
+                        </div>
+                        <button class="btn" onclick="registerOfficer()">👮 Register Officer</button>
+                    </div>
+
+                    <!-- Register Party Tab -->
+                    <div id="register-party" class="admin-content">
+                        <h3>🎉 Register Political Party</h3>
+                        <div class="form-group">
+                            <label for="party-name">Party Name</label>
+                            <input type="text" id="party-name" placeholder="Enter political party name">
+                        </div>
+                        <div class="form-group">
+                            <label>Select Party Symbol</label>
+                            <div class="symbol-grid" id="symbol-grid">
+                                <div class="symbol-option" onclick="selectSymbol('🗳️', this)">🗳️</div>
+                                <div class="symbol-option" onclick="selectSymbol('🏛️', this)">🏛️</div>
+                                <div class="symbol-option" onclick="selectSymbol('⚖️', this)">⚖️</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌟', this)">🌟</div>
+                                <div class="symbol-option" onclick="selectSymbol('🦅', this)">🦅</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌹', this)">🌹</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌿', this)">🌿</div>
+                                <div class="symbol-option" onclick="selectSymbol('🔥', this)">🔥</div>
+                                <div class="symbol-option" onclick="selectSymbol('💎', this)">💎</div>
+                                <div class="symbol-option" onclick="selectSymbol('🏆', this)">🏆</div>
+                                <div class="symbol-option" onclick="selectSymbol('🎯', this)">🎯</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌈', this)">🌈</div>
+                                <div class="symbol-option" onclick="selectSymbol('⭐', this)">⭐</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌍', this)">🌍</div>
+                                <div class="symbol-option" onclick="selectSymbol('🚀', this)">🚀</div>
+                                <div class="symbol-option" onclick="selectSymbol('💫', this)">💫</div>
+                                <div class="symbol-option" onclick="selectSymbol('🎪', this)">🎪</div>
+                                <div class="symbol-option" onclick="selectSymbol('🎨', this)">🎨</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌞', this)">🌞</div>
+                                <div class="symbol-option" onclick="selectSymbol('🌙', this)">🌙</div>
+                            </div>
+                            <input type="hidden" id="selected-symbol" value="">
+                        </div>
+                        <button class="btn" onclick="registerParty()">🎉 Register Party</button>
+                    </div>
+
+                    <!-- Dashboard Tab -->
+                    <div id="dashboard" class="admin-content">
+                        <h3>📋 System Dashboard</h3>
+                        <button class="btn" onclick="loadDashboard()">🔄 Refresh Dashboard</button>
+                        
+                        <div style="display: grid; gap: 30px; margin-top: 20px;">
+                            <div>
+                                <h4>👥 Registered Voters</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr><th>Name</th><th>ID Number</th><th>Status</th></tr>
+                                    </thead>
+                                    <tbody id="voters-table"></tbody>
+                                </table>
+                            </div>
+
+                            <div>
+                                <h4>👮 Polling Officers</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr><th>Name</th><th>Number</th><th>Key-ID</th></tr>
+                                    </thead>
+                                    <tbody id="officers-table"></tbody>
+                                </table>
+                            </div>
+
+                            <div>
+                                <h4>🎉 Parties & Vote Count</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr><th>Party Name</th><th>Symbol</th><th>Votes</th><th>Share</th></tr>
+                                    </thead>
+                                    <tbody id="parties-table"></tbody>
+                                </table>
+                            </div>
+
+                            <div>
+                                <h4>🚨 Fraudulent Activities</h4>
+                                <table class="table">
+                                    <thead>
+                                        <tr><th>Voter ID</th><th>Status</th></tr>
+                                    </thead>
+                                    <tbody id="fraud-table"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Election Results Tab -->
+                    <div id="results" class="admin-content">
+                        <h3>📊 Election Results</h3>
+                        <button class="btn" onclick="loadResults()">🔄 Refresh Results</button>
+                        
+                        <div id="results-display">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Party Name</th>
+                                        <th>Symbol</th>
+                                        <th>Votes</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="results-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- System Controls Tab -->
+                    <div id="system" class="admin-content">
+                        <h3>⚙️ System Controls</h3>
+                        <div style="margin: 20px 0;">
+                            <button class="btn btn-danger" onclick="resetSystem()">🔄 Reset Entire System</button>
+                            <button class="btn" onclick="loadDashboard()">📊 Refresh All Data</button>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Warning:</strong> System reset will delete all voters, parties, officers, votes, and blockchain data. This action cannot be undone.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officer Panel Section -->
+            <div id="officer" class="section">
+                <h2>👮 Polling Officer Control Center</h2>
+                
+                <!-- Officer Login -->
+                <div id="officer-login-form">
+                    <h3>Officer Authentication</h3>
+                    <div class="form-group">
+                        <label for="officer-id">Officer ID</label>
+                        <input type="text" id="officer-id" placeholder="Enter your officer ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="officer-key">Officer Key-ID</label>
+                        <input type="text" id="officer-key" placeholder="Enter your 4-digit key">
+                    </div>
+                    <button class="btn btn-large" onclick="officerLogin()">🔐 Login as Officer</button>
+                </div>
+
+                <!-- Officer Controls -->
+                <div id="officer-controls" class="hidden">
+                    <div class="officer-control-panel">
+                        <h3>📋 Polling Session Active</h3>
+                        <p><strong>Officer logged in successfully.</strong> You can now manage voter registration and voting process.</p>
+                        
+                        <div style="margin: 20px 0;">
+                            <button class="btn btn-success btn-large" onclick="showVoterLogin()">👥 Start New Voter</button>
+                            <button class="btn btn-danger btn-large" onclick="endPolling()">🔚 End Polling</button>
+                        </div>
+                    </div>
+
+                    <!-- Voter Login -->
+                    <div id="voter-login-section" class="hidden">
+                        <h3>👤 Voter Login</h3>
+                        <div class="form-group">
+                            <label for="voting-voter-id">Enter Voter ID</label>
+                            <input type="text" id="voting-voter-id" placeholder="Enter voter ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="voting-voter-name">Enter Voter Name</label>
+                            <input type="text" id="voting-voter-name" placeholder="Enter voter full name">
+                        </div>
+                        <button class="btn" onclick="registerAndVerifyVoter()">✅ Register & Verify Voter</button>
+                        <button class="btn" onclick="verifyExistingVoter()">🔍 Verify Existing Voter</button>
+                    </div>
+
+                    <!-- Biometric Verification -->
+                    <div id="biometric-verification" class="hidden">
+                        <h3>🔐 Biometric Verification</h3>
+                        <div class="biometric-area" onclick="performBiometric('thumb')">
+                            <h4>👍 Thumbprint Verification</h4>
+                            <p>Click here to scan voter's thumbprint</p>
+                        </div>
+                        <div class="biometric-area" onclick="performBiometric('iris')">
+                            <h4>👁️ Iris Verification</h4>
+                            <p>Click here to scan voter's iris</p>
+                        </div>
+                    </div>
+
+                    <!-- Ballot Interface -->
+                    <div id="ballot-interface" class="hidden">
+                        <div class="ballot-header">
+                            <h3>🗳️ OFFICIAL BALLOT</h3>
+                            <p>Select your preferred candidate/party</p>
+                        </div>
+                        <div id="parties-list" class="voting-interface">
+                            <!-- Parties will be loaded dynamically -->
+                        </div>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button class="btn btn-success btn-large" onclick="castVote()" id="cast-vote-btn" disabled>🗳️ Cast Vote</button>
+                            <button class="btn" onclick="cancelVoting()">❌ Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Vote Confirmation -->
+                    <div id="vote-confirmation" class="hidden">
+                        <div class="alert alert-success">
+                            <h4>✅ Vote Recorded Successfully!</h4>
+                            <p>The vote has been securely encrypted with quantum cryptography and recorded on the blockchain.</p>
+                            <p><strong>Vote ID:</strong> <span id="vote-transaction-id"></span></p>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-large" onclick="showVoterLogin()">👥 Next Voter</button>
+                            <button class="btn btn-danger" onclick="endPolling()">🔚 End Polling</button>
+                        </div>
+                    </div>
+
+                    <!-- End Polling Confirmation -->
+                    <div id="end-polling-section" class="hidden">
+                        <h3>🔚 End Polling Session</h3>
+                        <div class="alert alert-info">
+                            <p>Please enter your Officer Key-ID to confirm ending this polling session.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="end-polling-key">Officer Key-ID</label>
+                            <input type="text" id="end-polling-key" placeholder="Enter your 4-digit key">
+                        </div>
+                        <button class="btn btn-danger" onclick="confirmEndPolling()">🔚 Confirm End Polling</button>
+                        <button class="btn" onclick="cancelEndPolling()">❌ Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentVoterId = null;
+        let selectedParty = null;
+        let selectedSymbol = null;
+        let isAdminLoggedIn = false;
+        let isOfficerLoggedIn = false;
+        const API_BASE = 'http://localhost:5000';
+
+        // Utility functions
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            
+            const content = document.querySelector('.content');
+            content.insertBefore(alertDiv, content.firstChild);
+            
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (sectionName === 'admin' && isAdminLoggedIn) {
+                loadDashboard();
+            }
+        }
+
+        function showAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.admin-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'dashboard') {
+                loadDashboard();
+            } else if (tabName === 'results') {
+                loadResults();
+            }
+        }
+
+        function selectSymbol(symbol, element) {
+            document.querySelectorAll('.symbol-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            selectedSymbol = symbol;
+            document.getElementById('selected-symbol').value = symbol;
+        }
+
+        // Admin functions
+        async function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin_login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    isAdminLoggedIn = true;
+                    document.getElementById('admin-login').classList.add('hidden');
+                    document.getElementById('admin-controls').classList.remove('hidden');
+                    showAlert('Admin login successful!', 'success');
+                    loadDashboard();
+                } else {
+                    showAlert('Invalid admin credentials!', 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        async function registerOfficer() {
+            const name = document.getElementById('officer-name').value;
+            const number = document.getElementById('officer-number').value;
+            
+            if (!name || !number) {
+                showAlert('Please fill in all officer details!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/register_officer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, number })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showAlert(`Officer registered successfully! Key-ID: ${result.key_id}`, 'success');
+                    document.getElementById('officer-name').value = '';
+                    document.getElementById('officer-number').value = '';
+                } else {
+                    showAlert('Registration failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        async function registerParty() {
+            const party_name = document.getElementById('party-name').value;
+            const symbol = selectedSymbol;
+            
+            if (!party_name || !symbol) {
+                showAlert('Please enter party name and select a symbol!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/register_party`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ party_name, symbol })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showAlert('Party registered successfully!', 'success');
+                    document.getElementById('party-name').value = '';
+                    selectedSymbol = null;
+                    document.querySelectorAll('.symbol-option').forEach(option => {
+                        option.classList.remove('selected');
+                    });
+                } else {
+                    showAlert('Registration failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        async function resetSystem() {
+            if (!confirm('Are you sure you want to reset the entire system? This will delete all data!')) {
+                return;
+            }
+            
+            const password = prompt('Enter admin password to confirm:');
+            
+            try {
+                const response = await fetch(`${API_BASE}/reset_system`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showAlert('System reset successfully!', 'success');
+                    loadDashboard();
+                } else {
+                    showAlert('Reset failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        // Officer functions
+        async function officerLogin() {
+            const id = document.getElementById('officer-id').value;
+            const key_id = document.getElementById('officer-key').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/officer_login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, key_id })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    isOfficerLoggedIn = true;
+                    document.getElementById('officer-login-form').classList.add('hidden');
+                    document.getElementById('officer-controls').classList.remove('hidden');
+                    showAlert('Officer login successful!', 'success');
+                } else {
+                    showAlert('Invalid officer credentials!', 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        function showVoterLogin() {
+            // Hide other sections
+            document.getElementById('biometric-verification').classList.add('hidden');
+            document.getElementById('ballot-interface').classList.add('hidden');
+            document.getElementById('vote-confirmation').classList.add('hidden');
+            document.getElementById('end-polling-section').classList.add('hidden');
+            
+            // Show voter login
+            document.getElementById('voter-login-section').classList.remove('hidden');
+            
+            // Clear form
+            document.getElementById('voting-voter-id').value = '';
+            document.getElementById('voting-voter-name').value = '';
+            currentVoterId = null;
+            selectedParty = null;
+        }
+
+        async function registerAndVerifyVoter() {
+            const voter_id = document.getElementById('voting-voter-id').value;
+            const name = document.getElementById('voting-voter-name').value;
+            
+            if (!voter_id || !name) {
+                showAlert('Please fill in voter ID and name!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/register_voter`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voter_id, name })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    currentVoterId = voter_id;
+                    document.getElementById('voter-login-section').classList.add('hidden');
+                    document.getElementById('biometric-verification').classList.remove('hidden');
+                    showAlert('Voter registered successfully! Please complete biometric verification.', 'success');
+                } else {
+                    showAlert('Registration failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        async function verifyExistingVoter() {
+            const voter_id = document.getElementById('voting-voter-id').value;
+            
+            if (!voter_id) {
+                showAlert('Please enter voter ID!', 'error');
+                return;
+            }
+            
+            currentVoterId = voter_id;
+            document.getElementById('voter-login-section').classList.add('hidden');
+            document.getElementById('biometric-verification').classList.remove('hidden');
+            showAlert('Please complete biometric verification.', 'info');
+        }
+
+        async function performBiometric(type) {
+            if (!currentVoterId) {
+                showAlert('Please verify voter ID first!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/verify_biometric`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voter_id: currentVoterId, type })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showAlert(`${type} biometric verified successfully!`, 'success');
+                    document.getElementById('biometric-verification').classList.add('hidden');
+                    document.getElementById('ballot-interface').classList.remove('hidden');
+                    loadParties();
+                } else {
+                    showAlert('Biometric verification failed: ' + result.error, 'error');
+                    if (result.error.includes('Fraud')) {
+                        showVoterLogin();
+                    }
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        async function loadParties() {
+            try {
+                const response = await fetch(`${API_BASE}/get_parties`);
+                const result = await response.json();
+                
+                const partiesList = document.getElementById('parties-list');
+                partiesList.innerHTML = '';
+                
+                if (result.parties && result.parties.length > 0) {
+                    result.parties.forEach(party => {
+                        const partyCard = document.createElement('div');
+                        partyCard.className = 'party-card';
+                        partyCard.onclick = () => selectParty(party.party_name, partyCard);
+                        partyCard.innerHTML = `
+                            <span class="party-symbol">${party.symbol}</span>
+                            <div class="party-name">${party.party_name}</div>
+                        `;
+                        partiesList.appendChild(partyCard);
+                    });
+                } else {
+                    partiesList.innerHTML = '<p>No parties registered yet. Please contact admin.</p>';
+                }
+            } catch (error) {
+                showAlert('Error loading parties: ' + error.message, 'error');
+            }
+        }
+
+        function selectParty(partyName, cardElement) {
+            document.querySelectorAll('.party-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            cardElement.classList.add('selected');
+            selectedParty = partyName;
+            document.getElementById('cast-vote-btn').disabled = false;
+        }
+
+        async function castVote() {
+            if (!selectedParty || !currentVoterId) {
+                showAlert('Please select a party!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/cast_vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        voter_id: currentVoterId, 
+                        party_name: selectedParty 
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    document.getElementById('ballot-interface').classList.add('hidden');
+                    document.getElementById('vote-confirmation').classList.remove('hidden');
+                    document.getElementById('vote-transaction-id').textContent = generateTransactionId();
+                    showAlert('Vote cast successfully!', 'success');
+                } else {
+                    showAlert('Vote casting failed: ' + result.error, 'error');
+                    if (result.error.includes('Fraud')) {
+                        showVoterLogin();
+                    }
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        function cancelVoting() {
+            if (confirm('Are you sure you want to cancel this voting session?')) {
+                showVoterLogin();
+            }
+        }
+
+        function endPolling() {
+            document.getElementById('voter-login-section').classList.add('hidden');
+            document.getElementById('biometric-verification').classList.add('hidden');
+            document.getElementById('ballot-interface').classList.add('hidden');
+            document.getElementById('vote-confirmation').classList.add('hidden');
+            document.getElementById('end-polling-section').classList.remove('hidden');
+        }
+
+        function cancelEndPolling() {
+            document.getElementById('end-polling-section').classList.add('hidden');
+            showVoterLogin();
+        }
+
+        async function confirmEndPolling() {
+            const officer_key_id = document.getElementById('end-polling-key').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/end_session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ officer_key_id })
+                });
+                
+                const result = await response.json();
+                
+                if (result.ok) {
+                    showAlert('Polling session ended successfully!', 'success');
+                    isOfficerLoggedIn = false;
+                    document.getElementById('officer-login-form').classList.remove('hidden');
+                    document.getElementById('officer-controls').classList.add('hidden');
+                    document.getElementById('officer-id').value = '';
+                    document.getElementById('officer-key').value = '';
+                } else {
+                    showAlert('Invalid Officer Key-ID!', 'error');
+                }
+            } catch (error) {
+                showAlert('Connection error: ' + error.message, 'error');
+            }
+        }
+
+        function generateTransactionId() {
+            return 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        // Dashboard and Results functions
+        async function loadResults() {
+            try {
+                const response = await fetch(`${API_BASE}/get_results`);
+                const result = await response.json();
+                
+                const tableBody = document.getElementById('results-table-body');
+                tableBody.innerHTML = '';
+                
+                if (result.results && result.results.length > 0) {
+                    result.results.forEach((party, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>#${index + 1}</td>
+                            <td>${party.party_name}</td>
+                            <td style="text-align: center; font-size: 1.5em;">${party.symbol}</td>
+                            <td><strong>${party.votes}</strong></td>
+                            <td>${party.percentage}%</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No results available</td></tr>';
+                }
+            } catch (error) {
+                showAlert('Error loading results: ' + error.message, 'error');
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard`);
+                const result = await response.json();
+                
+                // Load voters data
+                const votersTable = document.getElementById('voters-table');
+                votersTable.innerHTML = '';
+                if (result.voters && result.voters.length > 0) {
+                    result.voters.forEach(voter => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${voter.name}</td>
+                            <td>${voter.id_number}</td>
+                            <td><span class="status-indicator status-success"></span>Registered</td>
+                        `;
+                        votersTable.appendChild(row);
+                    });
+                } else {
+                    votersTable.innerHTML = '<tr><td colspan="3" style="text-align: center;">No voters registered</td></tr>';
+                }
+                
+                // Load officers data
+                const officersTable = document.getElementById('officers-table');
+                officersTable.innerHTML = '';
+                if (result.polling_officers && result.polling_officers.length > 0) {
+                    result.polling_officers.forEach(officer => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${officer.name}</td>
+                            <td>${officer.number}</td>
+                            <td>${officer.key_id}</td>
+                        `;
+                        officersTable.appendChild(row);
+                    });
+                } else {
+                    officersTable.innerHTML = '<tr><td colspan="3" style="text-align: center;">No officers registered</td></tr>';
+                }
+                
+                // Load parties data
+                const partiesTable = document.getElementById('parties-table');
+                partiesTable.innerHTML = '';
+                if (result.parties_votes && result.parties_votes.length > 0) {
+                    result.parties_votes.forEach(party => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${party.party_name}</td>
+                            <td style="text-align: center; font-size: 1.2em;">${party.symbol}</td>
+                            <td><strong>${party.votes}</strong></td>
+                            <td>${party.percentage}%</td>
+                        `;
+                        partiesTable.appendChild(row);
+                    });
+                } else {
+                    partiesTable.innerHTML = '<tr><td colspan="4" style="text-align: center;">No parties registered</td></tr>';
+                }
+                
+                // Load fraud data
+                const fraudTable = document.getElementById('fraud-table');
+                fraudTable.innerHTML = '';
+                if (result.fraudulent_voter_ids && result.fraudulent_voter_ids.length > 0) {
+                    result.fraudulent_voter_ids.forEach(fraudId => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${fraudId}</td>
+                            <td><span class="status-indicator status-error"></span>Fraudulent Activity Detected</td>
+                        `;
+                        fraudTable.appendChild(row);
+                    });
+                } else {
+                    fraudTable.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #4CAF50;">No fraudulent activities detected</td></tr>';
+                }
+                
+            } catch (error) {
+                showAlert('Error loading dashboard: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-refresh dashboard every 30 seconds if admin is logged in
+            setInterval(() => {
+                if (isAdminLoggedIn && document.getElementById('dashboard').classList.contains('active')) {
+                    loadDashboard();
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
